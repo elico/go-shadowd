@@ -110,12 +110,15 @@ func (serverconn *ShadowdConn) SendToShadowd(req *http.Request) (string, error) 
 		}
 	}
 	host, port, err := net.SplitHostPort(req.Host)
-	if err != nil {
+	if err != nil && serverconn.Debug {
 		fmt.Println("Error parsing server host+port", err)
-		//return "", err
 	}
-	inputmap["SERVER|HTTP_HOST"] = host
-	inputmap["SERVER|HTTP_PORT"] = port
+	if host != "" {
+		inputmap["SERVER|HTTP_HOST"] = host
+		inputmap["SERVER|HTTP_PORT"] = port
+	} else {
+		inputmap["SERVER|HTTP_HOST"] = req.Host
+	}
 	newmap["input"] = inputmap
 
 	jsonData, err := json.Marshal(inputmap)
