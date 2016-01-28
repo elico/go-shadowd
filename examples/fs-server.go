@@ -1,12 +1,14 @@
+// An example http file server that is protected against floods attacks
+//
 package main
 
 import (
-	"github.com/elico/go-shadowd"
 	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/elico/go-metalink-parser"
+	"github.com/elico/go-shadowd"
 	"github.com/elico/mux"
 	"io"
 	"net/http"
@@ -30,7 +32,7 @@ var shadowd_rawdata *bool
 var err error
 var shadowServer shadowd.ShadowdConn
 
-var internalerrorpage =`<!DOCTYPE html>
+var internalerrorpage = `<!DOCTYPE html>
 <html>
 <head>
 <title>Error</title>
