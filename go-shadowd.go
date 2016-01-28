@@ -1,3 +1,7 @@
+// This package gives the option for a golang based http service to
+// send http requests for analysis against the shadowd WAF.
+// Examples at: https://github.com/elico/go-shadowd/tree/master/examples
+//
 package shadowd
 
 import (
