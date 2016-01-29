@@ -43,6 +43,7 @@ type ShadowdConn struct {
 	ProfileKey string
 	Logfile    string
 	Debug      bool
+	LogFullCookie	bool
 }
 
 func escapeKey(key string) string {
@@ -81,22 +82,22 @@ func (serverconn *ShadowdConn) SendToShadowd(req *http.Request) (string, error) 
 		}
 	}
 
-	coockie := req.Cookies()
-	for _, v := range coockie {
-		inputmap["COOKIE|"+strings.ToUpper(v.Name)] = v.Value
+	cookie := req.Cookies()
+	for _, v := range cookie {
+		inputmap["COOKIE|"+escapeKey(strings.ToUpper(v.Name))] = v.Value
 	}
-
-	inputmap["SERVER|HTTP_COOKIE"] = ""
-	for _, v := range coockie {
-		inputmap["SERVER|HTTP_COOKIE"] = inputmap["SERVER|HTTP_COOKIE"] + v.Name + "=" + v.Value + "; "
+	if serverconn.LogFullCookie {
+		inputmap["SERVER|HTTP_COOKIE"] = ""
+		for _, v := range cookie {
+			inputmap["SERVER|HTTP_COOKIE"] = inputmap["SERVER|HTTP_COOKIE"] + v.Name + "=" + v.Value + "; "
+		}
+		if len(inputmap["SERVER|HTTP_COOKIE"]) == 0 {
+			delete(inputmap, "SERVER|HTTP_COOKIE")
+		}
 	}
-	if len(inputmap["SERVER|HTTP_COOKIE"]) == 0 {
-		delete(inputmap, "SERVER|HTTP_COOKIE")
-	}
-
 	headers := req.Header
 	for k, v := range headers {
-		inputmap["SERVER|HTTP_"+strings.Replace(strings.ToUpper(k), "-", "_", -1)] = strings.Join(v, "")
+		inputmap["SERVER|HTTP_"+escapeKey(strings.Replace(strings.ToUpper(k), "-", "_", -1))] = strings.Join(v, "")
 	}
 
 	if req.Method != "GET" && serverconn.ReadBody {
