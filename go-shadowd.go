@@ -37,13 +37,14 @@ var VERSION = "2.0.1"
 
 // A shadowd connection, this allows to send a request for analysis.
 type ShadowdConn struct {
-	ServerAddr string
-	ReadBody   bool
-	ProfileId  string
-	ProfileKey string
-	Logfile    string
-	Debug      bool
-	LogFullCookie	bool
+	ServerAddr    string
+	ReadBody      bool
+	UpperCookies  bool
+	ProfileId     string
+	ProfileKey    string
+	Logfile       string
+	Debug         bool
+	LogFullCookie bool
 }
 
 func escapeKey(key string) string {
@@ -84,7 +85,11 @@ func (serverconn *ShadowdConn) SendToShadowd(req *http.Request) (string, error) 
 
 	cookie := req.Cookies()
 	for _, v := range cookie {
-		inputmap["COOKIE|"+escapeKey(strings.ToUpper(v.Name))] = v.Value
+		if serverconn.UpperCookies {
+			inputmap["COOKIE|"+escapeKey(strings.ToUpper(v.Name))] = v.Value
+		} else {
+			inputmap["COOKIE|"+escapeKey(v.Name)] = v.Value
+		}
 	}
 	if serverconn.LogFullCookie {
 		inputmap["SERVER|HTTP_COOKIE"] = ""
